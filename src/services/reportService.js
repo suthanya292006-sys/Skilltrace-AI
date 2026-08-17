@@ -1,27 +1,30 @@
 /**
  * Report Service
- * Simulated async service layer structured to connect to FastAPI backend & MongoDB database.
- * 
- * Future FastAPI + MongoDB + ML API endpoints:
- * - GET /api/v1/reports/primary (Fetch active 4 career intelligence report cards)
- * - GET /api/v1/reports/:id (Fetch detailed report with ML predictions and skill gaps)
- * - GET /api/v1/reports/history (Fetch historical report audit trail)
- * - POST /api/v1/reports/generate (Trigger background ML report generation worker)
- * - DELETE /api/v1/reports/history/:id (Delete/archive historical report log)
+ * Async service layer connecting to user session & structured for FastAPI REST backend integration.
  */
 
 import { primaryReportsData, reportHistoryData, studentInfo } from '../utils/reportsData';
+import { getCurrentUser } from './authService';
 
-// Helper delay simulator
-const delay = (ms = 400) => new Promise((resolve) => window.setTimeout(resolve, ms));
+const delay = (ms = 350) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
 /**
  * Fetch the 4 primary report cards for Career Intelligence dashboard.
  */
 export async function getPrimaryReports() {
-  await delay(450);
+  await delay(350);
+  const activeUser = getCurrentUser();
+
+  const student = {
+    ...studentInfo,
+    name: activeUser?.fullName || studentInfo.name,
+    email: activeUser?.email || studentInfo.email,
+    department: activeUser?.department || studentInfo.department,
+    college: activeUser?.college || studentInfo.college,
+  };
+
   return {
-    student: studentInfo,
+    student,
     reports: primaryReportsData,
   };
 }
@@ -30,12 +33,11 @@ export async function getPrimaryReports() {
  * Fetch single detailed report by ID or type key.
  */
 export async function getReportById(reportIdOrType) {
-  await delay(350);
+  await delay(300);
   if (primaryReportsData[reportIdOrType]) {
     return primaryReportsData[reportIdOrType];
   }
 
-  // Find in values if searching by unique report ID
   const found = Object.values(primaryReportsData).find((r) => r.id === reportIdOrType);
   if (found) return found;
 
@@ -46,21 +48,18 @@ export async function getReportById(reportIdOrType) {
  * Fetch report history log with search, type, and status filtering.
  */
 export async function getReportHistory({ search = '', typeFilter = 'All', statusFilter = 'All' } = {}) {
-  await delay(300);
+  await delay(250);
 
   let filtered = [...reportHistoryData];
 
-  // 1. Type Filter
   if (typeFilter && typeFilter !== 'All') {
     filtered = filtered.filter((item) => item.type === typeFilter);
   }
 
-  // 2. Status Filter
   if (statusFilter && statusFilter !== 'All') {
     filtered = filtered.filter((item) => item.status === statusFilter);
   }
 
-  // 3. Search Filter
   if (search.trim()) {
     const q = search.toLowerCase().trim();
     filtered = filtered.filter(
@@ -83,7 +82,7 @@ export async function getReportHistory({ search = '', typeFilter = 'All', status
  * Simulate generating a fresh AI Report.
  */
 export async function generateReport({ reportType = 'portfolio-analysis', depth = 'Standard' } = {}) {
-  await delay(1500); // Simulate ML calculation latency
+  await delay(1200);
 
   const baseReport = primaryReportsData[reportType] || primaryReportsData['portfolio-analysis'];
   const newScore = Math.min(99, Math.max(75, baseReport.score + Math.floor(Math.random() * 5) - 2));
@@ -104,7 +103,6 @@ export async function generateReport({ reportType = 'portfolio-analysis', depth 
     size: '3.4 MB',
   };
 
-  // Prepend to history data for active session persistence
   reportHistoryData.unshift(newHistoryItem);
 
   return {
@@ -123,7 +121,7 @@ export async function generateReport({ reportType = 'portfolio-analysis', depth 
  * Delete a report from history log.
  */
 export async function deleteHistoryReport(id) {
-  await delay(250);
+  await delay(200);
   const idx = reportHistoryData.findIndex((item) => item.id === id);
   if (idx !== -1) {
     reportHistoryData.splice(idx, 1);

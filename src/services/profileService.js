@@ -1,33 +1,48 @@
 /**
  * SkillTrace AI - Student Profile Service
- * Async service layer structured for future FastAPI + MongoDB REST backend integration.
- * 
- * Future REST Endpoints:
- * - GET /api/v1/users/me (Fetch active student profile)
- * - PUT /api/v1/users/me (Update profile fields)
- * - POST /api/v1/users/me/skills (Add technical skill)
- * - DELETE /api/v1/users/me/skills/:name (Remove technical skill)
- * - POST /api/v1/users/me/projects (Add portfolio project)
- * - POST /api/v1/users/me/certifications (Add certification)
+ * Dynamic user profile store with multi-user isolation & LocalStorage persistence.
+ * Structured for future FastAPI + MongoDB REST backend integration.
  */
 
 import { initialStudentProfile, calculateProfileCompletion } from '../utils/profileData';
+import { getCurrentUser, getInitials } from './authService';
 
-const STORAGE_KEY = 'skilltrace_student_profile';
+const getStorageKey = () => {
+  const user = getCurrentUser();
+  const userKey = user?.email ? user.email.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'default';
+  return `skilltrace_student_profile_${userKey}`;
+};
 
-const delay = (ms = 350) => new Promise((resolve) => window.setTimeout(resolve, ms));
+const delay = (ms = 250) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
 /**
- * Helper to get persisted profile from localStorage or initialize with initialStudentProfile.
+ * Helper to get persisted profile from localStorage or create dynamically for logged-in user.
  */
 function getStoredProfile() {
+  const user = getCurrentUser();
+  const key = getStorageKey();
+
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
+    const data = localStorage.getItem(key);
     if (data) return JSON.parse(data);
   } catch (err) {
     console.error('Failed to parse student profile from localStorage:', err);
   }
-  return initialStudentProfile;
+
+  // Create personalized profile template if no stored profile exists for this user
+  const personalized = {
+    ...initialStudentProfile,
+    id: user?.id || `stu-${Date.now()}`,
+    fullName: user?.fullName || 'Suthanya',
+    email: user?.email || 'suthanya@gmail.com',
+    initials: user?.initials || getInitials(user?.fullName || 'Suthanya'),
+    department: user?.department || 'Computer Science & Engineering',
+    college: user?.college || 'Institute of Engineering & Technology',
+    createdAt: user?.createdAt || 'Aug 2026',
+  };
+
+  saveStoredProfile(personalized);
+  return personalized;
 }
 
 /**
@@ -35,7 +50,8 @@ function getStoredProfile() {
  */
 function saveStoredProfile(profile) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    const key = getStorageKey();
+    localStorage.setItem(key, JSON.stringify(profile));
   } catch (err) {
     console.error('Failed to save student profile to localStorage:', err);
   }
@@ -45,7 +61,7 @@ function saveStoredProfile(profile) {
  * Fetch student profile.
  */
 export async function getStudentProfile() {
-  await delay(300);
+  await delay(200);
   const profile = getStoredProfile();
   const completion = calculateProfileCompletion(profile);
   return {
@@ -58,7 +74,7 @@ export async function getStudentProfile() {
  * Update student profile fields.
  */
 export async function updateStudentProfile(updatedFields) {
-  await delay(400);
+  await delay(300);
   const current = getStoredProfile();
   const updated = {
     ...current,
@@ -83,7 +99,7 @@ export async function updateStudentProfile(updatedFields) {
  * Add a new technical skill.
  */
 export async function addStudentSkill(skillObj) {
-  await delay(250);
+  await delay(200);
   const profile = getStoredProfile();
   const exists = profile.skills.some((s) => s.name.toLowerCase() === skillObj.name.toLowerCase());
 
@@ -103,7 +119,7 @@ export async function addStudentSkill(skillObj) {
  * Remove a technical skill.
  */
 export async function removeStudentSkill(skillName) {
-  await delay(200);
+  await delay(150);
   const profile = getStoredProfile();
   profile.skills = profile.skills.filter((s) => s.name !== skillName);
   saveStoredProfile(profile);
@@ -119,7 +135,7 @@ export async function removeStudentSkill(skillName) {
  * Add a new project.
  */
 export async function addStudentProject(projectObj) {
-  await delay(350);
+  await delay(250);
   const profile = getStoredProfile();
   const newProject = {
     id: `proj-${Date.now()}`,
@@ -139,7 +155,7 @@ export async function addStudentProject(projectObj) {
  * Add a new certification.
  */
 export async function addStudentCertification(certObj) {
-  await delay(300);
+  await delay(200);
   const profile = getStoredProfile();
   const newCert = {
     id: `cert-${Date.now()}`,

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ProtectedRoute from './ProtectedRoute';
 
 import SplashScreen from '../pages/auth/SplashScreen';
 import WelcomePage from '../pages/auth/WelcomePage';
@@ -19,11 +20,13 @@ import SkillGapAnalysisPage from '../pages/skillgap/SkillGapAnalysisPage';
 import CompanyRecommendationPage from '../pages/companies/CompanyRecommendationPage';
 import ReportsPage from '../pages/reports/ReportsPage';
 import ProfilePage from '../pages/profile/ProfilePage';
+import SettingsPage from '../pages/settings/SettingsPage';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Module 1 — Authentication */}
+      {/* Public Auth Routes */}
       <Route path="/" element={<SplashScreen />} />
       <Route path="/welcome" element={<WelcomePage />} />
       <Route element={<AuthLayout />}>
@@ -32,29 +35,23 @@ export default function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
 
-      {/* Module 2 — Student Dashboard */}
-      <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        {/* Module 3 — Portfolio Management */}
-        <Route path="/portfolio" element={<PortfolioPage />} />
-        {/* Module 4 — AI Portfolio Analysis */}
-        <Route path="/dashboard/portfolio-analysis" element={<AIPortfolioAnalysis />} />
-        {/* Module 5 — Online Skill Assessment */}
-        <Route path="/assessment" element={<AssessmentPageFlow />} />
-        {/* Module 6 — Skill Analysis Dashboard */}
-        <Route path="/skills" element={<SkillAnalysisDashboard />} />
-        {/* Module 7 — Career Recommendation */}
-        <Route path="/career" element={<CareerRecommendationPage />} />
-        {/* Module 8 — Placement Prediction */}
-        <Route path="/placement" element={<PlacementPredictionPage />} />
-        {/* Module 9 — Skill Gap Analysis */}
-        <Route path="/skill-gap" element={<SkillGapAnalysisPage />} />
-        {/* Module 10 — Company Recommendation */}
-        <Route path="/companies" element={<CompanyRecommendationPage />} />
-        {/* Module 11 — Career Intelligence Reports */}
-        <Route path="/reports" element={<ReportsPage />} />
-        {/* Module 12 & 13 — Student Profile & Notifications */}
-        <Route path="/profile" element={<ProfilePage />} />
+      {/* Protected Private Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/dashboard/portfolio-analysis" element={<AIPortfolioAnalysis />} />
+          <Route path="/assessment" element={<AssessmentPageFlow />} />
+          <Route path="/skills" element={<SkillAnalysisDashboard />} />
+          <Route path="/career" element={<CareerRecommendationPage />} />
+          <Route path="/placement" element={<PlacementPredictionPage />} />
+          <Route path="/skill-gap" element={<SkillGapAnalysisPage />} />
+          <Route path="/companies" element={<CompanyRecommendationPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
