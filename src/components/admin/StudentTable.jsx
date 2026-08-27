@@ -287,17 +287,19 @@ export default function StudentTable({ students = [], onToggleStatus }) {
             {paginatedStudents.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                  <Box sx={{ maxWidth: 360, mx: 'auto', textAlign: 'center' }}>
+                  <Box sx={{ maxWidth: 380, mx: 'auto', textAlign: 'center' }}>
                     <FiFilter size={32} color={tokens.slate} style={{ marginBottom: 8 }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: tokens.ink }}>
-                      No Students Found
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.ink }}>
+                      No student accounts available yet.
                     </Typography>
                     <Typography variant="caption" sx={{ color: tokens.slate, display: 'block', mb: 2 }}>
-                      No student records matched your search query or active filter settings.
+                      Registered student accounts will automatically appear here as users sign up.
                     </Typography>
-                    <Button variant="contained" size="small" onClick={handleResetFilters} sx={{ bgcolor: tokens.teal }}>
-                      Clear All Filters
-                    </Button>
+                    {students.length > 0 && (
+                      <Button variant="contained" size="small" onClick={handleResetFilters} sx={{ bgcolor: tokens.teal }}>
+                        Clear All Filters
+                      </Button>
+                    )}
                   </Box>
                 </TableCell>
               </TableRow>

@@ -27,9 +27,9 @@ export default function SkillProgressCard({ skillKey, label, value, level, note 
   const color = levelColor(value);
 
   return (
-    <Box sx={{ border: `1px solid ${tokens.line}`, borderRadius: 3, p: 2.4, height: '100%' }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.4 }}>
-        <Stack direction="row" spacing={1.2} alignItems="center">
+    <Box sx={{ border: `1px solid ${tokens.line}`, borderRadius: 3, p: 2.4, height: '100%', minWidth: 0, overflow: 'hidden' }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 1.4, minWidth: 0 }}>
+        <Stack direction="row" spacing={1.2} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
           <Box
             sx={{
               width: 32,
@@ -39,15 +39,16 @@ export default function SkillProgressCard({ skillKey, label, value, level, note 
               color,
               display: 'grid',
               placeItems: 'center',
+              flexShrink: 0,
             }}
           >
             <Icon size={16} />
           </Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, wordBreak: 'break-word', minWidth: 0 }}>
             {label}
           </Typography>
         </Stack>
-        <Chip label={level} size="small" sx={{ bgcolor: `${color}1F`, color, fontWeight: 600, fontSize: 11 }} />
+        <Chip label={level} size="small" sx={{ bgcolor: `${color}1F`, color, fontWeight: 600, fontSize: 11, flexShrink: 0 }} />
       </Stack>
 
       <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.6 }}>

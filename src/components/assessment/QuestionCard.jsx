@@ -22,14 +22,6 @@ export default function QuestionCard({ question, selectedValue, onSelect }) {
             ))}
           </RadioGroup>
         </Box>
-        <Box sx={{ borderRadius: 2, bgcolor: 'rgba(102,112,133,0.06)', p: 1.6 }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.6 }}>
-            Explanation placeholder
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {question.explanation}
-          </Typography>
-        </Box>
       </Stack>
     </DashboardCard>
   );

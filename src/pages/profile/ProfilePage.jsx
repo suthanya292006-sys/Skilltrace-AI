@@ -37,6 +37,10 @@ import ProfileHeader from '../../components/profile/ProfileHeader';
 import ProfileSection from '../../components/profile/ProfileSection';
 import SkillList from '../../components/profile/SkillList';
 import ProfileForm from '../../components/profile/ProfileForm';
+import ProjectDialog from '../../components/portfolio/ProjectDialog';
+import CertificationDialog from '../../components/portfolio/CertificationDialog';
+import ProjectsSection from '../../components/portfolio/ProjectsSection';
+import CertificationsSection from '../../components/portfolio/CertificationsSection';
 import NotificationPanel from '../../components/notifications/NotificationPanel';
 import {
   getStudentProfile,
@@ -44,7 +48,11 @@ import {
   addStudentSkill,
   removeStudentSkill,
   addStudentProject,
+  updateStudentProject,
+  deleteStudentProject,
   addStudentCertification,
+  updateStudentCertification,
+  deleteStudentCertification,
 } from '../../services/profileService';
 import { tokens } from '../../styles/theme';
 
@@ -120,37 +128,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Quick Add Project Simulation
-  const handleAddSampleProject = async () => {
-    const proj = {
-      title: 'Full Stack Micro-Frontend Suite',
-      description: 'Modular architecture project built using Vite, Module Federation, and TailwindCSS.',
-      techStack: ['React', 'TypeScript', 'Docker', 'Vite'],
-      liveUrl: 'https://demo-app.vercel.app',
-      githubUrl: 'https://github.com/aditisharma/micro-frontend-suite',
-      featured: true,
-      impact: 'Advanced Architecture',
-    };
-    const res = await addStudentProject(proj);
-    setProfile((prev) => ({ ...prev, projects: res.projects }));
-    setCompletion(res.completion);
-    showToast('New project added to your portfolio!', 'success');
-  };
 
-  // Quick Add Cert Simulation
-  const handleAddSampleCert = async () => {
-    const cert = {
-      title: 'Google Cloud Associate Cloud Engineer',
-      issuer: 'Google Cloud Platform (GCP)',
-      issueDate: 'Jul 2026',
-      credentialId: 'GCP-ACE-884102',
-      verificationUrl: 'https://cloud.google.com/verify/GCP-ACE-884102',
-    };
-    const res = await addStudentCertification(cert);
-    setProfile((prev) => ({ ...prev, certifications: res.certifications }));
-    setCompletion(res.completion);
-    showToast('New cloud certification added!', 'success');
-  };
 
   if (loading) {
     return (
@@ -367,79 +345,14 @@ export default function ProfilePage() {
               </ProfileSection>
 
               {/* Projects Section */}
-              <ProfileSection title="Featured Projects" icon={FiFolder} actionText="+ Add Project" onActionClick={handleAddSampleProject}>
-                <Stack spacing={2}>
-                  {profile.projects?.map((proj) => (
-                    <Paper key={proj.id} sx={{ p: 2.2, border: `1px solid ${tokens.line}`, borderRadius: 2.5, bgcolor: '#ffffff' }}>
-                      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 1 }}>
-                        <Box>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: tokens.ink, lineHeight: 1.3 }}>
-                            {proj.title}
-                          </Typography>
-                          <Chip label={proj.impact} size="small" sx={{ bgcolor: 'rgba(15,157,140,0.1)', color: tokens.tealDark, fontSize: 10, fontWeight: 700, height: 20, mt: 0.5 }} />
-                        </Box>
-                        <Stack direction="row" spacing={0.5}>
-                          {proj.githubUrl && (
-                            <Tooltip title="View GitHub Repo">
-                              <IconButton size="small" onClick={() => window.open(proj.githubUrl, '_blank')}>
-                                <FiGithub size={15} />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                          {proj.liveUrl && (
-                            <Tooltip title="View Live Demo">
-                              <IconButton size="small" onClick={() => window.open(proj.liveUrl, '_blank')}>
-                                <FiExternalLink size={15} color={tokens.teal} />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </Stack>
-                      </Stack>
-
-                      <Typography variant="body2" sx={{ color: tokens.slate, fontSize: 13, mb: 1.5, lineHeight: 1.4 }}>
-                        {proj.description}
-                      </Typography>
-
-                      <Stack direction="row" flexWrap="wrap" gap={0.6}>
-                        {proj.techStack?.map((t) => (
-                          <Chip key={t} label={t} size="small" variant="outlined" sx={{ height: 20, fontSize: 10.5, borderColor: tokens.line }} />
-                        ))}
-                      </Stack>
-                    </Paper>
-                  ))}
-                </Stack>
-              </ProfileSection>
+              <Box sx={{ mb: 3 }}>
+                <ProjectsSection />
+              </Box>
 
               {/* Certifications Section */}
-              <ProfileSection title="Certifications & Accreditations" icon={FiAward} actionText="+ Add Cert" onActionClick={handleAddSampleCert}>
-                <Stack spacing={2}>
-                  {profile.certifications?.map((cert) => (
-                    <Paper key={cert.id} sx={{ p: 2, border: `1px solid ${tokens.line}`, borderRadius: 2.5, bgcolor: '#ffffff' }}>
-                      <Stack direction="row" alignItems="center" justifyContent="space-between">
-                        <Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: tokens.ink }}>
-                            {cert.title}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: tokens.tealDark, fontWeight: 600, display: 'block' }}>
-                            {cert.issuer} · Issued {cert.issueDate}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: tokens.slate, fontSize: 11 }}>
-                            Credential ID: {cert.credentialId}
-                          </Typography>
-                        </Box>
-
-                        {cert.verificationUrl && (
-                          <Tooltip title="Verify Credential">
-                            <IconButton size="small" onClick={() => window.open(cert.verificationUrl, '_blank')}>
-                              <FiExternalLink size={15} color={tokens.teal} />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Stack>
-                    </Paper>
-                  ))}
-                </Stack>
-              </ProfileSection>
+              <Box sx={{ mb: 3 }}>
+                <CertificationsSection />
+              </Box>
             </Grid>
           </Grid>
         </Box>

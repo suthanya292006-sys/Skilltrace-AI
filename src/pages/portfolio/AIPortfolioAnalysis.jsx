@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Chip, Grid, Skeleton, Stack, Typography } from '@mui/material';
+import { useEffect, useState, useCallback } from 'react';
+import { Box, Button, Chip, Grid, Skeleton, Stack, Typography, Snackbar, Alert, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
-import { FiActivity, FiRefreshCw } from 'react-icons/fi';
+import { FiActivity, FiRefreshCw, FiPlusCircle, FiFileText, FiFolder, FiAward } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../../components/ui/DashboardCard';
 import PortfolioScoreCard from '../../components/portfolio/PortfolioScoreCard';
 import TechnicalDepthCard from '../../components/portfolio/TechnicalDepthCard';
@@ -15,33 +16,57 @@ import WeaknessCard from '../../components/portfolio/WeaknessCard';
 import RecommendationCard from '../../components/portfolio/RecommendationCard';
 import RadarSkillChart from '../../components/charts/RadarSkillChart';
 import PortfolioBarChart from '../../components/charts/PortfolioBarChart';
-import { getPortfolioAnalysis } from '../../services/portfolioAnalysisService';
+import { getPortfolioAnalysis, runPortfolioAnalysis } from '../../services/portfolioAnalysisService';
 import { tokens } from '../../styles/theme';
 
 export default function AIPortfolioAnalysis() {
+  const navigate = useNavigate();
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [empty, setEmpty] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
 
-  const loadAnalysis = async () => {
-    setLoading(true);
-    const data = await getPortfolioAnalysis();
-    setAnalysis(data);
-    setLoading(false);
-    setEmpty(!data);
-  };
+  const loadAnalysis = useCallback(async (forceRecalculate = false) => {
+    if (forceRecalculate) {
+      setAnalyzing(true);
+    } else {
+      setLoading(true);
+    }
 
-  useEffect(() => {
-    loadAnalysis();
+    try {
+      const data = await runPortfolioAnalysis(forceRecalculate);
+      setAnalysis(data);
+      if (forceRecalculate && data.hasRequiredInputs) {
+        setToast({
+          open: true,
+          message: `Portfolio analysis updated! Last updated: ${data.lastUpdated}`,
+          severity: 'success',
+        });
+      }
+    } catch (err) {
+      console.error('Failed to run portfolio analysis:', err);
+      setToast({
+        open: true,
+        message: 'Failed to run analysis. Please try again.',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+      setAnalyzing(false);
+    }
   }, []);
 
+  useEffect(() => {
+    loadAnalysis(false);
+  }, [loadAnalysis]);
+
   const handleAnalyzeAgain = async () => {
-    await loadAnalysis();
+    await loadAnalysis(true);
   };
 
   if (loading) {
     return (
-      <Box>
+      <Box sx={{ pb: 6 }}>
         <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
           <Box>
             <Skeleton variant="text" width={240} height={36} />
@@ -49,7 +74,6 @@ export default function AIPortfolioAnalysis() {
           </Box>
           <Stack direction="row" spacing={1.5}>
             <Skeleton variant="rounded" width={140} height={40} />
-            <Skeleton variant="rounded" width={120} height={40} />
           </Stack>
         </Box>
 
@@ -67,33 +91,72 @@ export default function AIPortfolioAnalysis() {
               </Grid>
             </Grid>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Skeleton variant="rounded" height={220} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Skeleton variant="rounded" height={220} />
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <Skeleton variant="rounded" height={220} />
-          </Grid>
         </Grid>
       </Box>
     );
   }
 
-  if (empty || !analysis) {
+  // Requirement 7 & 11: If user has not provided required inputs, show professional data collection empty state
+  if (!analysis || !analysis.hasRequiredInputs) {
     return (
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-        <DashboardCard title="AI Portfolio Analysis" subtitle="No portfolio analysis available." icon={FiActivity}>
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-              No portfolio analysis available.
+        <DashboardCard title="AI Portfolio Analysis" subtitle="Portfolio data collection required" icon={FiActivity}>
+          <Box sx={{ py: 5, px: 2, textAlign: 'center', maxWidth: 640, mx: 'auto' }}>
+            <Box
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                bgcolor: 'rgba(15,157,140,0.1)',
+                color: tokens.teal,
+                display: 'grid',
+                placeItems: 'center',
+                mx: 'auto',
+                mb: 2,
+              }}
+            >
+              <FiPlusCircle size={28} />
+            </Box>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: tokens.ink }}>
+              No portfolio data available yet.
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
-              Generate a fresh AI review to see your readiness metrics and recommendations.
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3.5, lineHeight: 1.6 }}>
+              Add your skills, projects, certifications, or resume to generate your real AI Portfolio Analysis. The system evaluates your actual entered data to produce authentic readiness scores.
             </Typography>
-            <Button variant="contained" onClick={handleAnalyzeAgain} startIcon={<FiRefreshCw size={15} />}>
-              Analyze Portfolio
+
+            <Grid container spacing={2} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<FiFolder size={16} />}
+                  onClick={() => navigate('/portfolio')}
+                  sx={{ py: 1.2, fontWeight: 700, borderRadius: 2.5 }}
+                >
+                  Add Projects & Skills
+                </Button>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<FiFileText size={16} />}
+                  onClick={() => navigate('/portfolio')}
+                  sx={{ py: 1.2, fontWeight: 700, borderRadius: 2.5 }}
+                >
+                  Upload Resume
+                </Button>
+              </Grid>
+            </Grid>
+
+            <Button
+              variant="contained"
+              onClick={() => loadAnalysis(true)}
+              disabled={analyzing}
+              startIcon={analyzing ? <CircularProgress size={16} color="inherit" /> : <FiRefreshCw size={15} />}
+              sx={{ bgcolor: tokens.teal, '&:hover': { bgcolor: tokens.tealDark }, px: 3, py: 1.2, fontWeight: 700, borderRadius: 2.5 }}
+            >
+              {analyzing ? 'Checking Inputs...' : 'Analyze Portfolio'}
             </Button>
           </Box>
         </DashboardCard>
@@ -102,27 +165,32 @@ export default function AIPortfolioAnalysis() {
   }
 
   return (
-    <Box>
+    <Box sx={{ pb: 6 }}>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.4 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.4 }}>
               AI Portfolio Analysis
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Analyze your portfolio using AI-powered insights.
+              Real-time portfolio evaluation generated from your saved skills, projects, certs, and resume data.
             </Typography>
           </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.2} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }}>
             <Button
-              variant="outlined"
+              variant="contained"
               onClick={handleAnalyzeAgain}
-              startIcon={<FiRefreshCw size={15} />}
-              sx={{ borderColor: tokens.line, color: 'text.primary' }}
+              disabled={analyzing}
+              startIcon={analyzing ? <CircularProgress size={15} color="inherit" /> : <FiRefreshCw size={15} />}
+              sx={{ bgcolor: tokens.teal, '&:hover': { bgcolor: tokens.tealDark }, fontWeight: 700, px: 2.5, py: 1 }}
             >
-              Analyze Again
+              {analyzing ? 'Analyzing...' : 'Analyze Again'}
             </Button>
-            <Chip label={`Last updated ${analysis.lastUpdated}`} color="default" sx={{ bgcolor: 'rgba(15,157,140,0.1)', color: tokens.tealDark, fontWeight: 600 }} />
+            <Chip
+              label={`Last updated: ${analysis.lastUpdated}`}
+              color="default"
+              sx={{ bgcolor: 'rgba(15,157,140,0.1)', color: tokens.tealDark, fontWeight: 700, px: 0.5, fontSize: 12 }}
+            />
           </Stack>
         </Box>
       </motion.div>
@@ -168,13 +236,17 @@ export default function AIPortfolioAnalysis() {
           <IndustryReadinessCard data={analysis.readiness} />
         </Grid>
 
-        <Grid size={{ xs: 12 }}>
-          <KeywordSection keywords={analysis.keywords} />
-        </Grid>
+        {analysis.keywords && analysis.keywords.length > 0 && (
+          <Grid size={{ xs: 12 }}>
+            <KeywordSection keywords={analysis.keywords} />
+          </Grid>
+        )}
 
-        <Grid size={{ xs: 12 }}>
-          <TechnologyGrid technologies={analysis.technologies} />
-        </Grid>
+        {analysis.technologies && analysis.technologies.length > 0 && (
+          <Grid size={{ xs: 12 }}>
+            <TechnologyGrid technologies={analysis.technologies} />
+          </Grid>
+        )}
 
         <Grid size={{ xs: 12, lg: 6 }}>
           <StrengthCard strengths={analysis.strengths} />
@@ -186,13 +258,29 @@ export default function AIPortfolioAnalysis() {
         <Grid size={{ xs: 12 }}>
           <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' } }}>
             {analysis.recommendations.map((item, index) => (
-              <motion.div key={item.title} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: index * 0.05 }}>
+              <motion.div key={item.title || index} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: index * 0.05 }}>
                 <RecommendationCard item={item} />
               </motion.div>
             ))}
           </Box>
         </Grid>
       </Grid>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={3500}
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+          severity={toast.severity}
+          variant="filled"
+          sx={{ borderRadius: 2.5, fontWeight: 600 }}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

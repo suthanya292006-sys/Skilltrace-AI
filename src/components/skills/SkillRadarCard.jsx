@@ -1,14 +1,15 @@
 import { FiHexagon } from 'react-icons/fi';
 import DashboardCard from '../ui/DashboardCard';
 import AssessmentRadarChart from '../charts/AssessmentRadarChart';
-import { skillMetrics } from '../../utils/skillAnalysisData';
+import { skillMetrics as defaultMetrics } from '../../utils/skillAnalysisData';
 
-export default function SkillRadarCard() {
+export default function SkillRadarCard({ metrics }) {
+  const dataList = metrics || defaultMetrics;
   return (
-    <DashboardCard title="Skill Radar" subtitle="All five tracked dimensions" icon={FiHexagon}>
+    <DashboardCard title="Skill Radar" subtitle="Tracked engineering dimensions" icon={FiHexagon}>
       <AssessmentRadarChart
-        labels={skillMetrics.map((s) => s.label)}
-        values={skillMetrics.map((s) => s.value)}
+        labels={dataList.map((s) => s.label)}
+        values={dataList.map((s) => s.value)}
       />
     </DashboardCard>
   );

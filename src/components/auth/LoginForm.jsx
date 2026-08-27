@@ -54,12 +54,6 @@ export default function LoginForm() {
     }
   };
 
-  // Fast demo login shortcut
-  const handleQuickDemoUser = (email, password = 'password123') => {
-    setValue('email', email);
-    setValue('password', password);
-  };
-
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       {submitError && (
@@ -67,27 +61,6 @@ export default function LoginForm() {
           {submitError}
         </Alert>
       )}
-
-      {/* Demo account helper chips */}
-      <Box sx={{ mb: 3, p: 1.5, borderRadius: 2.5, bgcolor: 'rgba(15,157,140,0.06)', border: `1px solid ${tokens.line}` }}>
-        <Typography variant="caption" sx={{ fontWeight: 700, color: tokens.slate, display: 'block', mb: 1 }}>
-          DEMO ACCOUNTS (Click to fill credentials):
-        </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5}>
-          <Chip
-            label="Suthanya (suthanya@gmail.com)"
-            size="small"
-            onClick={() => handleQuickDemoUser('suthanya@gmail.com', 'password123')}
-            sx={{ cursor: 'pointer', bgcolor: '#ffffff', fontWeight: 600, fontSize: 11 }}
-          />
-          <Chip
-            label="Keiko (keiko@gmail.com)"
-            size="small"
-            onClick={() => handleQuickDemoUser('keiko@gmail.com', 'password123')}
-            sx={{ cursor: 'pointer', bgcolor: '#ffffff', fontWeight: 600, fontSize: 11 }}
-          />
-        </Stack>
-      </Box>
 
       <TextField
         label="Username or Email Address"

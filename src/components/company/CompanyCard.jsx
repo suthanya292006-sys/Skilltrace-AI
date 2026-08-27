@@ -111,12 +111,12 @@ export default function CompanyCard({ company, isSaved, onToggleSave, onViewDeta
       )}
 
       {/* Top Header: Logo + Name + Save */}
-      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2 }}>
-        <Stack direction="row" spacing={1.6} alignItems="center">
+      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1} sx={{ mb: 2, minWidth: 0 }}>
+        <Stack direction="row" spacing={1.4} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
           <Box
             sx={{
-              width: 46,
-              height: 46,
+              width: 44,
+              height: 44,
               borderRadius: '12px',
               bgcolor: logoBg || tokens.ink,
               color: '#FFFFFF',
@@ -132,9 +132,9 @@ export default function CompanyCard({ company, isSaved, onToggleSave, onViewDeta
           >
             {logoText}
           </Box>
-          <Box>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 17, lineHeight: 1.2 }}>
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Stack direction="row" alignItems="center" spacing={0.8} flexWrap="wrap" sx={{ minWidth: 0 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 16, lineHeight: 1.2, wordBreak: 'break-word' }}>
                 {name}
               </Typography>
               <Chip
@@ -149,7 +149,7 @@ export default function CompanyCard({ company, isSaved, onToggleSave, onViewDeta
                 }}
               />
             </Stack>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: 12, mt: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: 12, mt: 0.3, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
               {tagline}
             </Typography>
           </Box>

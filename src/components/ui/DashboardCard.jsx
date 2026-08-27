@@ -9,12 +9,14 @@ export default function DashboardCard({ title, subtitle, action, icon: Icon, chi
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
         ...sx,
       }}
     >
       {(title || action) && (
-        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" spacing={1.2} alignItems="center">
+        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1} sx={{ mb: 2, minWidth: 0 }}>
+          <Stack direction="row" spacing={1.2} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
             {Icon && (
               <Box
                 sx={{
@@ -25,26 +27,29 @@ export default function DashboardCard({ title, subtitle, action, icon: Icon, chi
                   color: 'primary.dark',
                   display: 'grid',
                   placeItems: 'center',
+                  flexShrink: 0,
                 }}
               >
                 <Icon size={16} />
               </Box>
             )}
-            <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2, wordBreak: 'break-word' }}>
                 {title}
               </Typography>
               {subtitle && (
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', wordBreak: 'break-word' }}>
                   {subtitle}
                 </Typography>
               )}
             </Box>
           </Stack>
-          {action}
+          {action && <Box sx={{ flexShrink: 0 }}>{action}</Box>}
         </Stack>
       )}
-      {children}
+      <Box sx={{ minWidth: 0, width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </Box>
     </Paper>
   );
 }

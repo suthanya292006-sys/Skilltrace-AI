@@ -200,22 +200,7 @@ export default function ReportsPage() {
         </Button>
       </Stack>
 
-      {/* Demo AI Data Disclaimer Banner */}
-      <Alert
-        severity="info"
-        icon={<FiInfo size={18} />}
-        sx={{
-          mb: 4,
-          borderRadius: 3,
-          borderColor: tokens.line,
-          bgcolor: 'rgba(15,157,140,0.05)',
-          color: tokens.ink,
-          alignItems: 'center',
-          '& .MuiAlert-message': { fontSize: 13, fontWeight: 500 },
-        }}
-      >
-        <strong>Demo AI Predictions & Benchmarks:</strong> All metrics, placement probabilities, and career fit calculations use synthetic demo data for evaluation purposes.
-      </Alert>
+
 
       {/* Error State Banner */}
       {error && (

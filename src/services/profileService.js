@@ -48,7 +48,7 @@ function getStoredProfile() {
 /**
  * Helper to save profile to localStorage.
  */
-function saveStoredProfile(profile) {
+export function saveStoredProfile(profile) {
   try {
     const key = getStorageKey();
     localStorage.setItem(key, JSON.stringify(profile));
@@ -137,11 +137,61 @@ export async function removeStudentSkill(skillName) {
 export async function addStudentProject(projectObj) {
   await delay(250);
   const profile = getStoredProfile();
+  if (!profile.projects) profile.projects = [];
   const newProject = {
     id: `proj-${Date.now()}`,
-    ...projectObj,
+    title: projectObj.title || '',
+    description: projectObj.description || '',
+    techStack: projectObj.techStack || '',
+    githubUrl: projectObj.githubUrl || projectObj.githubLink || projectObj.link || '',
+    liveUrl: projectObj.liveUrl || projectObj.liveDemoLink || '',
+    image: projectObj.image || projectObj.projectImage || '',
+    createdAt: new Date().toISOString(),
   };
   profile.projects.unshift(newProject);
+  saveStoredProfile(profile);
+
+  return {
+    success: true,
+    projects: profile.projects,
+    completion: calculateProfileCompletion(profile),
+  };
+}
+
+/**
+ * Update an existing project.
+ */
+export async function updateStudentProject(projectId, updatedFields) {
+  await delay(250);
+  const profile = getStoredProfile();
+  if (!profile.projects) profile.projects = [];
+  const idx = profile.projects.findIndex((p) => p.id === projectId);
+  if (idx !== -1) {
+    profile.projects[idx] = {
+      ...profile.projects[idx],
+      ...updatedFields,
+      githubUrl: updatedFields.githubUrl || updatedFields.githubLink || updatedFields.link || profile.projects[idx].githubUrl,
+      liveUrl: updatedFields.liveUrl || updatedFields.liveDemoLink || profile.projects[idx].liveUrl,
+      image: updatedFields.image || updatedFields.projectImage || profile.projects[idx].image,
+    };
+    saveStoredProfile(profile);
+  }
+
+  return {
+    success: true,
+    projects: profile.projects,
+    completion: calculateProfileCompletion(profile),
+  };
+}
+
+/**
+ * Delete a project.
+ */
+export async function deleteStudentProject(projectId) {
+  await delay(150);
+  const profile = getStoredProfile();
+  if (!profile.projects) profile.projects = [];
+  profile.projects = profile.projects.filter((p) => p.id !== projectId);
   saveStoredProfile(profile);
 
   return {
@@ -157,9 +207,20 @@ export async function addStudentProject(projectObj) {
 export async function addStudentCertification(certObj) {
   await delay(200);
   const profile = getStoredProfile();
+  if (!profile.certifications) profile.certifications = [];
   const newCert = {
     id: `cert-${Date.now()}`,
-    ...certObj,
+    name: certObj.name || certObj.title || '',
+    title: certObj.name || certObj.title || '',
+    issuer: certObj.issuer || certObj.organization || '',
+    organization: certObj.issuer || certObj.organization || '',
+    issueDate: certObj.issueDate || certObj.year || '',
+    year: certObj.issueDate || certObj.year || '',
+    credentialId: certObj.credentialId || '',
+    credentialLink: certObj.credentialLink || certObj.verificationUrl || '',
+    verificationUrl: certObj.credentialLink || certObj.verificationUrl || '',
+    fileUrl: certObj.fileUrl || certObj.certificateFile || '',
+    createdAt: new Date().toISOString(),
   };
   profile.certifications.unshift(newCert);
   saveStoredProfile(profile);
@@ -170,3 +231,93 @@ export async function addStudentCertification(certObj) {
     completion: calculateProfileCompletion(profile),
   };
 }
+
+/**
+ * Update an existing certification.
+ */
+export async function updateStudentCertification(certId, updatedFields) {
+  await delay(200);
+  const profile = getStoredProfile();
+  if (!profile.certifications) profile.certifications = [];
+  const idx = profile.certifications.findIndex((c) => c.id === certId);
+  if (idx !== -1) {
+    profile.certifications[idx] = {
+      ...profile.certifications[idx],
+      ...updatedFields,
+      name: updatedFields.name || updatedFields.title || profile.certifications[idx].name,
+      title: updatedFields.name || updatedFields.title || profile.certifications[idx].title,
+      issuer: updatedFields.issuer || updatedFields.organization || profile.certifications[idx].issuer,
+      organization: updatedFields.issuer || updatedFields.organization || profile.certifications[idx].organization,
+      issueDate: updatedFields.issueDate || updatedFields.year || profile.certifications[idx].issueDate,
+      year: updatedFields.issueDate || updatedFields.year || profile.certifications[idx].year,
+      credentialId: updatedFields.credentialId !== undefined ? updatedFields.credentialId : profile.certifications[idx].credentialId,
+      credentialLink: updatedFields.credentialLink || updatedFields.verificationUrl || profile.certifications[idx].credentialLink,
+      verificationUrl: updatedFields.credentialLink || updatedFields.verificationUrl || profile.certifications[idx].verificationUrl,
+      fileUrl: updatedFields.fileUrl || updatedFields.certificateFile || profile.certifications[idx].fileUrl,
+    };
+    saveStoredProfile(profile);
+  }
+
+  return {
+    success: true,
+    certifications: profile.certifications,
+    completion: calculateProfileCompletion(profile),
+  };
+}
+
+/**
+ * Delete a certification.
+ */
+export async function deleteStudentCertification(certId) {
+  await delay(150);
+  const profile = getStoredProfile();
+  if (!profile.certifications) profile.certifications = [];
+  profile.certifications = profile.certifications.filter((c) => c.id !== certId);
+  saveStoredProfile(profile);
+
+  return {
+    success: true,
+    certifications: profile.certifications,
+    completion: calculateProfileCompletion(profile),
+  };
+}
+
+/**
+ * Save resume details for current user.
+ */
+export async function saveStudentResume(resumeObj) {
+  await delay(200);
+  const profile = getStoredProfile();
+  profile.resume = resumeObj;
+  saveStoredProfile(profile);
+  return { success: true, profile };
+}
+
+/**
+ * Remove stored resume.
+ */
+export async function removeStudentResume() {
+  await delay(150);
+  const profile = getStoredProfile();
+  profile.resume = null;
+  saveStoredProfile(profile);
+  return { success: true, profile };
+}
+
+/**
+ * Save computed portfolio analysis result.
+ */
+export async function savePortfolioAnalysis(analysisData) {
+  const profile = getStoredProfile();
+  profile.analysisResult = analysisData;
+  saveStoredProfile(profile);
+  return analysisData;
+}
+
+/**
+ * Synchronous profile fetch helper.
+ */
+export function getStoredProfileSync() {
+  return getStoredProfile();
+}
+
