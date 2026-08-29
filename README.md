@@ -1,119 +1,164 @@
-# SkillTrace AI — Frontend
+# SkillTrace AI
 
-React + Vite + MUI frontend for SkillTrace AI, built module by module.
+> An AI-powered student portfolio, skill assessment, career recommendation, and placement-readiness platform.
 
-## Stack
-React 19 · Vite · Material UI v9 · React Router DOM v7 · Axios · React Hook Form · Framer Motion · Chart.js (react-chartjs-2) · React Icons
+## Overview
 
-## Getting started
-```bash
-npm install
-npm run dev
-```
-Then open the printed local URL. The app starts at `/` (splash screen) and flows:
-`/` → `/welcome` → `/login` or `/register` → `/dashboard`.
+**SkillTrace AI** is an intelligent career development platform designed to help students evaluate their technical capabilities, manage their professional portfolios, identify skill gaps, and discover suitable career opportunities.
 
-You can also jump straight to a route, e.g. `/dashboard`, `/register`, `/forgot-password`.
+The platform brings together **skills, projects, certifications, resumes, assessment performance, and portfolio information** to create a comprehensive student profile. Using machine learning-based career analysis, SkillTrace AI provides personalized career recommendations based on the student's abilities and performance.
 
-## Design system
-Tokens live in `src/styles/theme.js`:
-- **Ink Navy** `#101828` — dark surfaces / primary text
-- **Signal Teal** `#0F9D8C` — primary brand & "growth" accent
-- **Amber Spark** `#F5A623` — achievement / score highlight
-- **Slate** `#667085` — secondary text · **Line** `#E4E7EC` — borders
+The platform also includes an **administrative portal** that enables administrators to monitor students, assessments, portfolios, career recommendations, companies, placement readiness, and overall platform analytics.
 
-Type: **Space Grotesk** (display/headings) + **Inter** (body/UI) + **IBM Plex Mono** (scores, stats, data).
+---
 
-Signature element: `TrajectoryMark` (`src/components/ui/TrajectoryMark.jsx`) — a rising, animated
-skill-growth curve reused across the splash screen, auth side panel and dashboard, tying visually
-back to the product name "SkillTrace."
+## Key Features
 
-## Module status
+### 🎓 Student Portfolio Management
 
-### Module 1 — Authentication (`pages/auth`) — done
-- `SplashScreen.jsx` — animated logo + trajectory reveal, auto-redirects to Welcome
-- `WelcomePage.jsx` — marketing hero with stats + CTA
-- `LoginPage.jsx` — email/password, show/hide password, Remember me, Google button (UI only), validation via React Hook Form
-- `RegisterPage.jsx` — full name, email, password + confirm, terms checkbox, validation
-- `ForgotPasswordPage.jsx` — email submit -> success confirmation state
-- Shared: `layouts/AuthLayout.jsx` (split-screen brand panel), `components/common/PasswordField.jsx`, `components/common/GoogleAuthButton.jsx`
+SkillTrace AI provides a centralized portfolio management system where students can maintain their professional information.
 
-### Module 2 — Student Dashboard (`pages/dashboard`, `components/dashboard`) — done
-- `DashboardHeader.jsx` — search, notifications dropdown, avatar
-- `Sidebar.jsx` — primary nav (routes are stubbed for Modules 3-15)
-- `WelcomeCard.jsx`, `ProfileSummaryCard.jsx`, `PortfolioScoreCard.jsx` (radar chart),
-  `SkillLevelCard.jsx` (progress bars), `PlacementProbabilityCard.jsx` (circular gauge),
-  `CareerRecommendationCard.jsx`, `AITipsCard.jsx`, `RecentActivityTimeline.jsx`,
-  `NotificationsMenu.jsx`, `QuickActions.jsx`
-- Assembled in `DashboardPage.jsx` behind `layouts/DashboardLayout.jsx`
+- Resume upload and portfolio management
+- Technical and professional skill management
+- Project and certification management
+- GitHub and LinkedIn profile integration
+- Centralized student career profile
+- Continuous portfolio updates
 
-All data on these pages is local mock/sample data — no API calls are wired yet.
+### 🤖 AI Portfolio Analysis
 
-### Module 3 — Portfolio Management (`pages/portfolio`, `components/portfolio`) — done
-Tabbed page (`PortfolioPage.jsx`) at `/portfolio`:
-- `ResumeUpload.jsx` — drag & drop, click-to-browse, simulated upload progress, uploaded-file card
-- `ProjectsSection.jsx` + `ProjectDialog.jsx` — gallery grid, add/edit/delete via dialog
-- `CertificationsSection.jsx` — upload list, remove certificate
-- `SkillsSection.jsx` — add-on-Enter skill chips with delete
-- `SocialLinksSection.jsx` — GitHub + LinkedIn profile fields with save state
+The platform analyzes portfolio information to provide meaningful insights into a student's technical profile.
 
-All data is local component state (no persistence/API yet).
+- Portfolio-based skill evaluation
+- Project and experience analysis
+- Identification of technical strengths
+- Portfolio improvement suggestions
+- Overall portfolio assessment
 
-### Module 4 — AI Portfolio Analysis (`pages/portfolio/AIPortfolioAnalysis.jsx`, `components/portfolio`) — done
-Score breakdown (Technical Depth, Documentation Quality, Innovation, Industry Readiness), skill
-extraction, technology grid, resume keywords, strengths/weaknesses, and recommendations — backed by
-`services/portfolioAnalysisService.js` and `utils/portfolioAnalysisData.js`. Route: `/dashboard/portfolio-analysis`.
+### 📝 Technical Assessments
 
-### Module 5 — Online Skill Assessment (`pages/assessment`, `components/assessment`) — done
-Full assessment flow (`AssessmentPageFlow.jsx`): home/category picker, instructions, timed question
-flow with palette/navigation, submission, results with pie/radar charts, and review — backed by
-`services/assessmentService.js` and `utils/assessmentDummyData.js`. Route: `/assessment`.
+Students can evaluate their technical knowledge through online assessments.
 
-### Module 6 — Skill Analysis Dashboard (`pages/skills`, `components/skills`) — done
-`SkillAnalysisDashboard.jsx` at `/skills`:
-- `OverallSkillCard.jsx` — weighted overall score with circular gauge + level tag
-- `SkillRadarCard.jsx` — radar across all five tracked dimensions
-- `SkillDistributionCard.jsx` — pie chart of skill-weight composition
-- `SkillBreakdownGrid.jsx` + `SkillProgressCard.jsx` — one card each for Programming, Communication,
-  Problem Solving, Database Knowledge, and System Design, with progress bar + level chip
-- Mock data centralized in `utils/skillAnalysisData.js`
+- Skill-based technical assessments
+- Question navigation and answer tracking
+- Automated assessment scoring
+- Mark questions for review
+- Performance analysis
+- Assessment-based skill evaluation
 
-### Module 7 — Career Recommendation (`pages/career`, `components/career`) — done
-`CareerRecommendationPage.jsx` at `/career`:
-- `CareerCard.jsx` — description, required skills, salary range, growth outlook, and career match %
-  for each of the 8 roles from the roadmap (ML Engineer, Data Scientist, Backend/Full Stack Developer,
-  Cloud Engineer, DevOps Engineer, Cybersecurity Analyst, QA Engineer)
-- `CareerSortControl.jsx` — sort by best match, salary, or growth
-- Mock data centralized in `utils/careerRecommendationData.js`
+### 📊 Skill Analysis
 
-### Module 8 — Placement Prediction (`pages/placement`, `components/placement`) — done
-`PlacementPredictionPage.jsx` at `/placement`:
-- `PlacementScoreCard.jsx` — half-circle gauge (new `charts/GaugeChart.jsx`) for the composite score
-- `ProbabilityConfidenceCard.jsx` — placement probability + confidence, reusing `CircularScoreChart`
-- `ExpectedOutcomesCard.jsx` — expected salary range and expected company tier
-- `PlacementTrendCard.jsx` — 6-month probability trend (new `charts/TrendLineChart.jsx`)
-- `PredictionExplanationCard.jsx` — weighted factors behind the prediction, most influential first
-- Mock data centralized in `utils/placementPredictionData.js`
+The skill analysis module helps students understand their current technical capabilities and areas that require improvement.
 
-### Module 9 — Skill Gap Analysis (`pages/skillgap`, `components/skillgap`) — done
-`SkillGapAnalysisPage.jsx` at `/skill-gap`:
-- `CurrentSkillsCard.jsx` / `MissingSkillsCard.jsx` — what you have vs. what's missing, as chip sets
-- `RecommendedSkillsCard.jsx` — priority-tagged skills with the reasoning behind each
-- `LearningRoadmapCard.jsx` — ordered step timeline with current-step highlight
-- `ProjectSuggestionsCard.jsx` — project ideas mapped to the specific skills they'd close
-- `LearningResourcesCard.jsx` — curated resources tagged free/paid per skill
-- `ImprovementTimelineCard.jsx` — horizontal milestone timeline over the next 8 weeks
-- Mock data centralized in `utils/skillGapData.js`
+- Technical skill evaluation
+- Skill-strength identification
+- Skill-gap analysis
+- Career-oriented skill comparison
+- Identification of skills required for specific career roles
 
-### Modules 10-15 — not started
-Folder scaffolding exists (`components/`, `pages/`) per the roadmap, but not yet implemented.
-Sidebar links to `/companies`, `/reports`, `/profile`, `/settings` are present but have no
-routes/pages yet — add them to `routes/AppRoutes.jsx` as each module is built.
+### 🎯 AI Career Recommendation
 
-## Notes for next modules
-- Wire `LoginPage` / `RegisterPage` submit handlers to a real `services/authService.js` once the
-  backend is ready — they currently just simulate a network call and redirect.
-- Reuse `DashboardCard` (`components/ui/DashboardCard.jsx`) as the base wrapper for any new
-  dashboard-style card so spacing/typography stay consistent.
-- Chart.js elements are registered once in `components/charts/chartSetup.js` — import it (side-effect
-  only) in any new chart component instead of re-registering.
+The career recommendation module uses a **trained machine learning model** to identify suitable career roles based on multiple student attributes.
+
+The recommendation considers:
+
+- Technical skills
+- Number of projects
+- Assessment performance
+- Portfolio score
+
+The machine learning model is integrated with the application through a **FastAPI-based REST API**, allowing career predictions to be generated dynamically from student data.
+
+### 💼 Career & Placement
+
+The platform helps students connect their skills and portfolio with potential career opportunities.
+
+- Personalized career recommendations
+- Career path exploration
+- Placement-readiness analysis
+- Suitable role identification
+- Company matching based on student profiles
+- Career-oriented skill insights
+
+### 📋 Reports & Analytics
+
+SkillTrace AI provides reports and analytics to help students and administrators understand performance and career readiness.
+
+- Student performance reports
+- Portfolio analysis reports
+- Career recommendation results
+- Skill-gap insights
+- Placement-readiness insights
+- Administrative analytics
+
+### 🛡️ Admin Portal
+
+The administrative portal provides centralized monitoring and management capabilities.
+
+Administrators can manage and monitor:
+
+- Student profiles
+- Assessments
+- Companies
+- Career paths
+- Portfolio analysis
+- Career recommendations
+- Placement information
+- Analytics and reports
+
+---
+
+## Technology Stack
+
+### Frontend
+
+- **React.js** – Component-based user interface
+- **Vite** – Fast frontend development and build tool
+- **JavaScript** – Application logic
+- **Material UI (MUI)** – UI components and responsive design
+- **HTML5** – Application structure
+- **CSS3** – Styling and layout
+
+### Backend
+
+- **Python** – Backend and machine learning development
+- **FastAPI** – REST API development
+- **Uvicorn** – ASGI server
+- **Pydantic** – Data validation and request handling
+
+### Machine Learning
+
+- **Python** – Model development
+- **Scikit-learn** – Machine learning model development
+- **Pandas** – Data processing
+- **NumPy** – Numerical computation
+- **Joblib** – Model serialization and loading
+
+### Development & Version Control
+
+- **Visual Studio Code** – Development environment
+- **Git** – Version control
+- **GitHub** – Source code management
+- **REST API** – Frontend-backend communication
+- **Swagger / OpenAPI** – API documentation and testing
+
+---
+
+## Core Workflow
+
+```text
+Student Profile
+      ↓
+Skills + Projects + Certifications
+      ↓
+Technical Assessment
+      ↓
+Assessment Score
+      ↓
+Portfolio Analysis
+      ↓
+Portfolio Score
+      ↓
+AI Career Recommendation
+      ↓
+Career Path & Placement Insights
